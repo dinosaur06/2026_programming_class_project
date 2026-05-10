@@ -1,11 +1,18 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <csignal> // 신호 처리를 위해 추가
 #include "Network.h"
 #include "Protocol.h"
 #include "Monitor.h" // 모니터링 기능 포함
-
 using namespace std;
+
+// Ctrl + C를 눌렀을 때 실행될 함수
+void handle_sigint(int sig) {
+    cout << "\n[!] 서버 종료 신호를 받았습니다. 리포트를 생성합니다..." << endl;
+    StopMonitoring(); // 여기서 리포트가 출력됩니다!
+    exit(sig);
+}
 
 int main() {
     // 1. 네트워크 라이브러리 초기화
@@ -36,6 +43,9 @@ int main() {
     cout << "   Fortress Game Server Started" << endl;
     cout << "   Port: 9000 | Mode: UDP" << endl;
     cout << "========================================" << endl;
+
+    // 신호 등록: Ctrl + C(SIGINT)가 들어오면 handle_sigint를 실행하라
+    signal(SIGINT, handle_sigint);
 
     // [중요] 4. 모니터링 스레드 시작 (별도 스레드에서 1초마다 출력)
     StartMonitoring();
