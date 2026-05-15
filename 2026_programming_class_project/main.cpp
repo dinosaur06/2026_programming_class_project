@@ -9,7 +9,7 @@ using namespace std;
 
 // Ctrl + C를 눌렀을 때 실행될 함수
 void handle_sigint(int sig) {
-    cout << "\n[!] 서버 종료 신호를 받았습니다. 리포트를 생성합니다..." << endl;
+    cout << "\n[!] Server shutdown signal received. Generating report..." << endl;
     StopMonitoring(); // 여기서 리포트가 출력됩니다!
     exit(sig);
 }

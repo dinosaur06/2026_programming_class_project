@@ -35,7 +35,7 @@ void MonitorLoop() {
 
         // 실시간 알람 (특정 값 이상일 때만 화면에 노출)
         if (currentCount > 1000) {
-            cout << "\a[!] 경고: 초당 패킷 급증! [" << elapsedSeconds << "초 지점] PPS: " << currentCount << endl;
+            cout << "\a[!] Warning: Packet per second spike at [" << elapsedSeconds << "seconds. PPS:" << currentCount << endl;
         }
     }
 }
@@ -65,17 +65,17 @@ void PrintFinalReport() {
 
     // 콘솔 화면에 즉시 요약 리포트 출력
     cout << "\n" << string(40, '=') << endl;
-    cout << "       [ 서버 보안 분석 결과 ]" << endl;
+    cout << "         [ Server Security Analysis Results ]" << endl;
     cout << string(40, '=') << endl;
-    cout << " - 서버 가동 시간: " << g_history.size() << "초" << endl;
-    cout << " - 누적 수신 패킷: " << grandTotalPackets << " 개" << endl;
-    cout << " - 피크 수치: " << maxPPS << " PPS (발생: " << maxPPSAt << "초)" << endl;
+    cout << " - Server Uptime: " << g_history.size() << "sec" << endl;
+    cout << " - Total Packets Received: " << grandTotalPackets << endl;
+    cout << " - Peak Value: " << maxPPS << " PPS (At: " << maxPPSAt << "sec)" << endl;
 
     if (!thresholdReachedTimes.empty()) {
-        cout << " - 이상 징후: " << thresholdReachedTimes.size() << "회 감지됨" << endl;
+        cout << " - Anomalies Detected: " << thresholdReachedTimes.size() << "회 감지됨" << endl;
     }
     else {
-        cout << " - 이상 징후: 없음" << endl;
+        cout << " - Anomalies Detected: None" << endl;
     }
     cout << string(40, '=') << endl;
 
@@ -83,28 +83,28 @@ void PrintFinalReport() {
     ofstream outFile("security_report.txt");
     if (outFile.is_open()) {
         outFile << "========================================" << endl;
-        outFile << "       서버 보안 정밀 분석 리포트" << endl;
+        outFile << "       Server Security Detailed Report" << endl;
         outFile << "========================================" << endl;
-        outFile << "1. 총 수신 패킷: " << grandTotalPackets << " 개" << endl;
-        outFile << "2. 최고 피크 PPS: " << maxPPS << " pkts/s (발생 시점: " << maxPPSAt << "초)" << endl;
-        outFile << "\n3. 임계치(" << threshold << " PPS) 초과 기록:" << endl;
+        outFile << "1. Total Packets Received: " << grandTotalPackets << " 개" << endl;
+        outFile << "2. Peak PPS Value: " << maxPPS << " pkts/s (At: " << maxPPSAt << "sec)" << endl;
+        outFile << "\n3. Threshold(" << threshold << " PPS) Exceedance Records:" << endl;
         if (thresholdReachedTimes.empty()) {
-            outFile << " - 감지된 이상 징후 없음" << endl;
+            outFile << " - No anomalies detected" << endl;
         }
         else {
             for (int t : thresholdReachedTimes) {
                 // 해당 시점의 상세 pps를 다시 찾아서 출력
-                outFile << " - [" << t << "초] 지점에서 임계치 초과 발생" << endl;
+                outFile << " - [At " << t << "s] Threshold exceeded" << endl;
             }
         }
 
-        outFile << "\n[전체 타임라인 데이터]" << std::endl;
-        outFile << "시간(초) | PPS | 트래픽(KB/s)" << std::endl;
+        outFile << "\n[Full Timeline Data]" << endl;
+        outFile << "Time(s) | PPS | Traffic(KB/s)" << endl;
         for (const auto& s : g_history) {
             outFile << setw(6) << s.second << " | " << setw(5) << s.pps << " | " << s.kbps << endl;
         }
         outFile.close();
-        cout << "\n[+] 리포트가 security_report.txt 파일이 생성되었습니다." << endl;
+        cout << "\n[+] Report successfully saved to 'security_report.txt'." << endl;
     }
     g_history.clear(); // 데이터 초기화
 }
