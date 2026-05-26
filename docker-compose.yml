@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # 1. MariaDB 컨테이너
+  mariadb:
+    image: mariadb:latest
+    container_name: sim-mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: my_database
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - sim-network
+
+  # 2. 우분투 서버 컨테이너
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: sim-server
+    ports:
+      - "9000:9000/udp"
+    depends_on:
+      - mariadb
+    networks:
+      - sim-network
+
+  # 3. 악의적인 클라이언트 컨테이너
+  attacker:
+    image: ubuntu:22.04
+    container_name: sim-attacker
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    # 컨테이너가 바로 종료되지 않도록 대기 상태 유지
+    command: tail -f /dev/null
+    networks:
+      - sim-network
+
+volumes:
+  db_data:
+
+networks:
+  sim-network:
+    driver: bridge
